@@ -721,6 +721,63 @@ public class BookController {
     }
 }
 EOF
+package com.lithub.controller;
+
+import org.springframework.web.bind.annotation.*;
+
+import java.util.*;
+
+@RestController
+@RequestMapping("/api/app")
+public class AppController {
+
+    private Map<Long, String> orders = new HashMap<>();
+
+    // 📖 Book Content (Page Flip)
+    @GetMapping("/content/{bookId}")
+    public String getContent(@PathVariable Long bookId) {
+        return "Page 1: Welcome to LitHub\n" +
+               "Page 2: This is your reader\n" +
+               "Page 3: Flip pages smoothly\n" +
+               "Page 4: Enjoy reading!";
+    }
+
+    // 📊 Save Reading Progress
+    @PostMapping("/progress")
+    public String saveProgress(@RequestParam Long userId,
+                               @RequestParam Long bookId,
+                               @RequestParam int page,
+                               @RequestParam int totalPages) {
+
+        double percent = ((double) page / totalPages) * 100;
+
+        return "Progress saved: " + percent + "%";
+    }
+
+    // 💳 Create Order
+    @PostMapping("/create")
+    public Map<String, Object> createOrder(@RequestParam Long userId,
+                                           @RequestParam Long bookId,
+                                           @RequestParam int amount) {
+
+        long orderId = new Random().nextLong();
+
+        Map<String, Object> res = new HashMap<>();
+        res.put("id", orderId);
+        res.put("status", "PENDING");
+
+        orders.put(orderId, "PENDING");
+
+        return res;
+    }
+
+    // 💳 Pay Order
+    @PostMapping("/pay/{id}")
+    public String pay(@PathVariable Long id) {
+        orders.put(id, "PAID");
+        return "Payment successful";
+    }
+}
 
 # ─── Exception Handler ────────────────────────────────────────────
 RUN cat > src/main/java/com/lithub/exception/GlobalExceptionHandler.java << 'EOF'
